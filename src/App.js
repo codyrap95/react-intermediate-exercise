@@ -1,24 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import axios from "axios";
+import "./App.css";
 
 function App() {
+  const [fetchState, setFetchState] = React.useState("");
+  const link = "https://randomuser.me/api/?results=20";
+
+  const apiFetch = async (link) => {
+    const response = await fetch(link).then((res) => res.json());
+    return response?.results;
+  };
+
+  const axiosFetch = async () => {
+    const response = await axios
+      .get("https://randomuser.me/api/?results=20")
+      .then((res) => res)
+      .catch((err) => err);
+    return response?.data?.results;
+  };
+
+  const clickHandler = async () => {
+    setFetchState("Loading...");
+    const data = await axiosFetch("https://randomuser.me/api/?results=20");
+    setFetchState(JSON.stringify(data));
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      <textarea value={fetchState}></textarea>
+      <br></br>
+      <button onClick={clickHandler}>Fetch</button>
+    </React.Fragment>
   );
 }
 
