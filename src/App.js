@@ -1,34 +1,38 @@
 import React from "react";
 import axios from "axios";
 import "./App.css";
+import Table from "./components/Table";
+
+const link = "https://randomuser.me/api/?results=20";
+
+const apiFetch = async (link) => {
+  const response = await fetch(link).then((res) => res.json());
+  return response?.results;
+};
+
+const axiosFetch = (link) => {
+  return axios
+    .get(link)
+    .then((res) => res.data.results)
+    .catch((err) => err);
+};
 
 function App() {
-  const [fetchState, setFetchState] = React.useState("");
-  const link = "https://randomuser.me/api/?results=20";
-
-  const apiFetch = async (link) => {
-    const response = await fetch(link).then((res) => res.json());
-    return response?.results;
-  };
-
-  const axiosFetch = async () => {
-    const response = await axios
-      .get("https://randomuser.me/api/?results=20")
-      .then((res) => res)
-      .catch((err) => err);
-    return response?.data?.results;
-  };
-
-  const clickHandler = async () => {
-    setFetchState("Loading...");
-    const data = await axiosFetch("https://randomuser.me/api/?results=20");
-    setFetchState(JSON.stringify(data));
-  };
+  const [people, setPeople] = React.useState([]);
+  React.useEffect(() => {
+    axiosFetch(link).then((apiPeople) => setPeople(apiPeople));
+  }, []);
   return (
     <React.Fragment>
-      <textarea value={fetchState}></textarea>
       <br></br>
-      <button onClick={clickHandler}>Fetch</button>
+      <button
+        onClick={() => {
+          console.log(people);
+        }}
+      >
+        LOG
+      </button>
+      <Table users={people}></Table>
     </React.Fragment>
   );
 }
