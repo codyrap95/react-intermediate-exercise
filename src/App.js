@@ -19,9 +19,35 @@ const axiosFetch = (link) => {
 
 function App() {
   const [people, setPeople] = React.useState([]);
+  const flattenLocations = (people) => {
+    const newPeople = [];
+    for (let user of people) {
+      const updatedLocation = {};
+      for (let key in user.location) {
+        if (typeof user.location[key] === "object")
+          updatedLocation[key] = Object.values(user.location[key]).join(" ");
+        else updatedLocation[key] = user.location[key];
+      }
+      newPeople.push({ ...user, location: updatedLocation });
+    }
+    console.log("nl", newPeople);
+    return newPeople;
+  };
+  const sortField = (fieldName) => {
+    setPeople((prev) => [
+      ...prev.sort((a, b) => {
+        if (a.location[fieldName] < b.location[fieldName]) return -1;
+        if (a.location[fieldName] > b.location[fieldName]) return 1;
+        return 0;
+      }),
+    ]);
+  };
   React.useEffect(() => {
-    axiosFetch(link).then((apiPeople) => setPeople(apiPeople));
+    axiosFetch(link).then((apiPeople) =>
+      setPeople(flattenLocations(apiPeople))
+    );
   }, []);
+  console.log("rerun", people);
   return (
     <React.Fragment>
       <br></br>
@@ -32,7 +58,7 @@ function App() {
       >
         LOG
       </button>
-      <Table users={people}></Table>
+      <Table users={people} fieldToBeSorted={sortField}></Table>
     </React.Fragment>
   );
 }
